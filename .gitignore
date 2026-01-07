@@ -2,3 +2,5 @@
 .python-version
 /wandb
 uv.lock
+
+/q_learning/wandb

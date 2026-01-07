@@ -71,7 +71,7 @@ class QNetwork(nn.Module):
 
 
 def make_env():
-    env = gym.make(ENV_NAME)
+    env = gym.make(ENV_NAME, render_mode="human")
     obs_dim = env.observation_space.shape[0]
     act_dim = env.action_space.n
     return env, obs_dim, act_dim
@@ -95,6 +95,7 @@ def train(run_id, config):
     )
     
     env, obs_dim, act_dim = make_env()
+    print(env)
     q_net = QNetwork(obs_dim, act_dim).to(DEVICE)
     optimizer = torch.optim.Adam(q_net.parameters(), lr=config.learning_rate)
     gamma = config.gamma
@@ -115,7 +116,7 @@ def train(run_id, config):
         
         while not done:
             action = q_net.sample_a(state, epsilon)
-            next_state, reward, done, info = env.step(action)
+            next_state, reward, done, truncated, info = env.step(action)
             if isinstance(info, dict) and 'TimeLimit.truncated' in info:
                 truncated = info.get('TimeLimit.truncated', False)
                 done = done and not truncated
